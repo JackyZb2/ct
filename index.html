@@ -2,13 +2,13 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>生日惊喜</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: "Microsoft YaHei", sans-serif;
+      font-family: "Microsoft YaHei", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       background: linear-gradient(135deg, #ff9a9e, #fad0c4);
       display: flex;
       flex-direction: column;
@@ -19,24 +19,15 @@
       overflow: hidden;
     }
 
-    h1, p, .slider {
-      display: none; /* 初始隐藏 */
-      animation: fadeIn 2s ease-in-out;
+    h1, p, .slider, .envelope {
+      display: none;
       z-index: 2;
       position: relative;
+      animation: fadeIn 0.8s ease-in-out;
     }
 
-    h1 {
-      font-size: 2.2em;
-      margin: 20px 0 10px;
-      color: #fff;
-    }
-
-    p {
-      font-size: 1.2em;
-      margin-bottom: 20px;
-      color: #fff;
-    }
+    h1 { font-size: 2.2em; color: #fff; margin: 20px 0 10px; }
+    p#message { font-size: 1.2em; color: #fff; margin-bottom: 20px; }
 
     .btn {
       background: #fff;
@@ -47,64 +38,132 @@
       text-decoration: none;
       box-shadow: 0 4px 6px rgba(0,0,0,0.2);
       transition: 0.3s;
-      margin-top: 20px;
       z-index: 2;
       position: relative;
     }
-
-    .btn:hover {
-      background: #ff6f91;
-      color: #fff;
-    }
+    .btn:hover { background: #ff6f91; color: #fff; }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* 相册滑动区 */
     .slider {
       position: relative;
-      width: 80%;
-      max-width: 300px;
+      width: 86%;
+      max-width: 360px;
       overflow: hidden;
       border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.25);
       margin-top: 20px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(3px);
     }
-
     .slides {
       display: flex;
       transition: transform 0.5s ease-in-out;
     }
-
     .slides img {
       width: 100%;
+      display: block;
       border-radius: 12px;
+      user-select: none;
+      -webkit-user-drag: none;
     }
 
     .nav {
       position: absolute;
       top: 50%;
-      width: 100%;
+      left: 0; right: 0;
       display: flex;
       justify-content: space-between;
       transform: translateY(-50%);
+      padding: 0 8px;
     }
-
     .nav button {
-      background: rgba(255,255,255,0.7);
+      background: rgba(255,255,255,0.85);
       border: none;
       padding: 8px;
       border-radius: 50%;
       cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
     }
 
-    /* 烟花 Canvas */
+    .envelope {
+      margin-top: 16px;
+      width: 64px;
+      height: 44px;
+      background: #fff;
+      border: 2px solid #ff6f91;
+      border-radius: 6px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .envelope::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0;
+      border-width: 22px 32px 0 32px;
+      border-style: solid;
+      border-color: #ff6f91 transparent transparent transparent;
+      border-radius: 2px;
+    }
+
+    .letter {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255,255,255,0.96);
+      z-index: 3;
+      overflow-y: auto;
+      animation: fadeIn 0.6s ease-in-out;
+      padding: 24px 16px 88px;
+      box-sizing: border-box;
+    }
+    .letter-inner {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+      padding: 24px 20px;
+      border: 1px solid #ffd1df;
+      text-align: left;
+    }
+    .letter-inner h2 {
+      margin: 0 0 12px;
+      color: #ff6f91;
+      text-align: center;
+      font-size: 1.6em;
+    }
+    .letter-inner p {
+      font-size: 1.08em;
+      line-height: 1.8;
+      color: #333;
+      white-space: pre-line;
+    }
+    .back-btn {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ff6f91;
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.95em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 4;
+    }
+
     canvas {
       position: fixed;
-      top: 0;
-      left: 0;
+      inset: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -113,19 +172,17 @@
   </style>
 </head>
 <body>
-  <!-- 初始只显示按钮 -->
   <a href="#" class="btn" onclick="showSurprise()">点我一下 🎁</a>
 
-  <!-- 隐藏的祝福内容 -->
   <h1 id="title">生日快乐 ❤️</h1>
   <p id="message">亲爱的，愿你每天都像今天一样幸福！</p>
 
-  <!-- 相册滑动区 -->
   <div class="slider" id="slider">
     <div class="slides" id="slides">
-      <img src="photo1.jpg">
-      <img src="photo2.jpg">
-      <img src="photo3.jpg">
+      <!-- 请替换为实际图片路径 -->
+      <img src="photo1.jpg" alt="photo1">
+      <img src="photo2.jpg" alt="photo2">
+      <img src="photo3.jpg" alt="photo3">
     </div>
     <div class="nav">
       <button onclick="prevSlide()">◀</button>
@@ -133,14 +190,40 @@
     </div>
   </div>
 
-  <!-- 烟花 Canvas -->
+  <div class="envelope" id="envelope" onclick="openLetter()" title="打开祝福信"></div>
+
+  <div class="letter" id="letter">
+    <div class="letter-inner">
+      <h2>给你的信 💌</h2>
+      <p id="letterContent">
+亲爱的雏田：
+
+认识你才一个多月，却让我觉得像是认识了很久的朋友。
+你的陪伴，让这个冬天不再孤单；每一次讲故事的时刻，都让我感受到温暖与安心。
+
+今天是你的生日，我想把最真挚的祝福送给你：
+愿你在新的岁月里，依旧笑容灿烂，心情明媚，所有的美好都如约而至。
+
+更重要的是，我希望能陪你一起走过未来的日子，
+和你一起度过更多的生日。
+
+生日快乐，雏田 ❤️。
+
+—— 子暄
+      </p>
+    </div>
+    <button class="back-btn" onclick="closeLetter()">返回</button>
+  </div>
+
   <canvas id="fireworks"></canvas>
 
   <script>
+    // 展示祝福与相册
     function showSurprise() {
       document.getElementById("title").style.display = "block";
       document.getElementById("message").style.display = "block";
       document.getElementById("slider").style.display = "block";
+      document.getElementById("envelope").style.display = "block";
       startFireworks();
       startAutoSlide();
     }
@@ -150,6 +233,7 @@
     function showSlide(index) {
       const slides = document.getElementById("slides");
       const total = slides.children.length;
+      if (total === 0) return;
       if (index < 0) index = total - 1;
       if (index >= total) index = 0;
       currentIndex = index;
@@ -158,36 +242,79 @@
     function prevSlide() { showSlide(currentIndex - 1); }
     function nextSlide() { showSlide(currentIndex + 1); }
 
-    // 自动轮播
-    let autoSlideInterval;
+    // 自动轮播（展开信纸时暂停）
+    let autoSlideInterval = null;
     function startAutoSlide() {
-      autoSlideInterval = setInterval(() => {
-        nextSlide();
-      }, 3000);
+      stopAutoSlide();
+      autoSlideInterval = setInterval(() => { nextSlide(); }, 3000);
     }
+    function stopAutoSlide() {
+      if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+      }
+    }
+
+    // 信纸开合
+    function openLetter() {
+      document.getElementById("letter").style.display = "block";
+      stopAutoSlide();
+    }
+    function closeLetter() {
+      document.getElementById("letter").style.display = "none";
+      startAutoSlide();
+    }
+
+    // 触控滑动支持
+    (function enableTouchSwipe() {
+      const slidesWrap = document.getElementById("slides");
+      let startX = 0, deltaX = 0, dragging = false;
+
+      slidesWrap.addEventListener("touchstart", (e) => {
+        dragging = true;
+        startX = e.touches[0].clientX;
+        deltaX = 0;
+      }, { passive: true });
+
+      slidesWrap.addEventListener("touchmove", (e) => {
+        if (!dragging) return;
+        deltaX = e.touches[0].clientX - startX;
+      }, { passive: true });
+
+      slidesWrap.addEventListener("touchend", () => {
+        if (!dragging) return;
+        dragging = false;
+        if (Math.abs(deltaX) > 40) {
+          if (deltaX < 0) nextSlide();
+          else prevSlide();
+        }
+      });
+    })();
 
     // 烟花效果
     function startFireworks() {
       const canvas = document.getElementById("fireworks");
       const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
 
       let particles = [];
-
-      function random(min, max) {
-        return Math.random() * (max - min) + min;
-      }
+      function random(min, max) { return Math.random() * (max - min) + min; }
 
       function createFirework(x, y) {
         const colors = ["#ff6f91", "#f9a825", "#29b6f6", "#a18cd1", "#fda085"];
         for (let i = 0; i < 50; i++) {
           particles.push({
-            x: x,
-            y: y,
+            x, y,
             vx: random(-3, 3),
             vy: random(-3, 3),
             alpha: 1,
+            decay: random(0.015, 0.03),
             color: colors[Math.floor(Math.random() * colors.length)]
           });
         }
@@ -195,27 +322,32 @@
 
       function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((p, i) => {
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
           p.x += p.vx;
           p.y += p.vy;
-          p.alpha -= 0.02;
-          ctx.fillStyle = p.color;
+          p.alpha -= p.decay;
+          if (p.alpha <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
           ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
           ctx.beginPath();
           ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
           ctx.fill();
-          if (p.alpha <= 0) particles.splice(i, 1);
-        });
+        }
+        ctx.globalAlpha = 1;
         requestAnimationFrame(animate);
       }
 
-      canvas.addEventListener("click", e => {
+      // 自动烟花与点击触发
+      setInterval(() => {
+        createFirework(random(80, canvas.width - 80), random(80, canvas.height - 120));
+      }, 1000);
+      canvas.addEventListener("click", (e) => {
         createFirework(e.clientX, e.clientY);
       });
-
-      setInterval(() => {
-        createFirework(random(100, canvas.width-100), random(100, canvas.height-100));
-      }, 1000);
 
       animate();
     }
